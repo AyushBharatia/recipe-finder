@@ -1,0 +1,18 @@
+[
+{
+"_id": "1",
+"title": "Chana Masala",
+"cuisine": "Indian",
+"ingredients": ["chickpeas", "tomato", "onion", "garlic"],
+"cookTime": 35,
+"servings": 4
+},
+{
+"_id": "2",
+"title": "Pesto Pasta",
+"cuisine": "Italian",
+"ingredients": ["pasta", "basil", "garlic", "parmesan"],
+"cookTime": 20,
+"servings": 2
+}
+]
