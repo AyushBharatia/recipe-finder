@@ -1,0 +1,110 @@
+[
+  {
+    "_id": "1",
+    "title": "Chana Masala",
+    "cuisine": "Indian",
+    "ingredients": ["chickpeas", "tomato", "onion", "garlic", "ginger", "garam masala", "cumin"],
+    "cookTime": 35,
+    "servings": 4,
+    "instructions": "1. Sauté onions until golden. 2. Add garlic, ginger, and spices. 3. Add tomatoes and cook until soft. 4. Add chickpeas and simmer for 15 minutes. 5. Garnish with cilantro and serve.",
+    "nutrition": {
+      "calories": 320,
+      "protein": 15,
+      "carbs": 45,
+      "fat": 8
+    },
+    "imageUrl": "https://example.com/chana-masala.jpg",
+    "createdAt": "2025-09-01T10:00:00Z",
+    "updatedAt": "2025-09-01T10:00:00Z"
+  },
+  {
+    "_id": "2",
+    "title": "Pesto Pasta",
+    "cuisine": "Italian",
+    "ingredients": ["pasta", "basil", "garlic", "parmesan", "pine nuts", "olive oil"],
+    "cookTime": 20,
+    "servings": 2,
+    "instructions": "1. Cook pasta according to package directions. 2. Blend basil, garlic, parmesan, pine nuts, and olive oil into a smooth paste. 3. Toss pasta with pesto. 4. Serve with extra parmesan.",
+    "nutrition": {
+      "calories": 450,
+      "protein": 12,
+      "carbs": 52,
+      "fat": 22
+    },
+    "imageUrl": "https://example.com/pesto-pasta.jpg",
+    "createdAt": "2025-09-02T14:30:00Z",
+    "updatedAt": "2025-09-02T14:30:00Z"
+  },
+  {
+    "_id": "3",
+    "title": "Tacos al Pastor",
+    "cuisine": "Mexican",
+    "ingredients": ["pork", "pineapple", "onion", "cilantro", "tortillas", "chili powder", "lime"],
+    "cookTime": 45,
+    "servings": 4,
+    "instructions": "1. Marinate pork with spices and pineapple juice. 2. Grill or pan-fry pork until cooked. 3. Chop pork and grill pineapple. 4. Serve in tortillas with onion, cilantro, and lime.",
+    "nutrition": {
+      "calories": 380,
+      "protein": 28,
+      "carbs": 35,
+      "fat": 15
+    },
+    "imageUrl": "https://example.com/tacos-al-pastor.jpg",
+    "createdAt": "2025-09-03T12:00:00Z",
+    "updatedAt": "2025-09-03T12:00:00Z"
+  },
+  {
+    "_id": "4",
+    "title": "Kung Pao Chicken",
+    "cuisine": "Chinese",
+    "ingredients": ["chicken", "peanuts", "bell pepper", "soy sauce", "garlic", "ginger", "chili peppers"],
+    "cookTime": 25,
+    "servings": 3,
+    "instructions": "1. Stir-fry chicken until cooked. 2. Add garlic, ginger, and chili peppers. 3. Add bell peppers and peanuts. 4. Pour in soy sauce mixture and toss. 5. Serve with rice.",
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 28,
+      "fat": 20
+    },
+    "imageUrl": "https://example.com/kung-pao-chicken.jpg",
+    "createdAt": "2025-09-04T18:15:00Z",
+    "updatedAt": "2025-09-04T18:15:00Z"
+  },
+  {
+    "_id": "5",
+    "title": "Classic Burger",
+    "cuisine": "American",
+    "ingredients": ["ground beef", "burger buns", "lettuce", "tomato", "onion", "cheese", "pickles"],
+    "cookTime": 15,
+    "servings": 2,
+    "instructions": "1. Form beef into patties and season with salt and pepper. 2. Grill or pan-fry patties to desired doneness. 3. Toast buns. 4. Assemble burgers with lettuce, tomato, onion, cheese, and pickles.",
+    "nutrition": {
+      "calories": 550,
+      "protein": 35,
+      "carbs": 42,
+      "fat": 28
+    },
+    "imageUrl": "https://example.com/classic-burger.jpg",
+    "createdAt": "2025-09-05T19:00:00Z",
+    "updatedAt": "2025-09-05T19:00:00Z"
+  },
+  {
+    "_id": "6",
+    "title": "Pad Thai",
+    "cuisine": "Thai",
+    "ingredients": ["rice noodles", "shrimp", "egg", "bean sprouts", "peanuts", "lime", "fish sauce", "tamarind"],
+    "cookTime": 30,
+    "servings": 2,
+    "instructions": "1. Soak rice noodles in warm water. 2. Stir-fry shrimp and set aside. 3. Scramble egg in the wok. 4. Add drained noodles and sauce. 5. Add shrimp, bean sprouts, and peanuts. 6. Serve with lime wedges.",
+    "nutrition": {
+      "calories": 480,
+      "protein": 26,
+      "carbs": 58,
+      "fat": 16
+    },
+    "imageUrl": "https://example.com/pad-thai.jpg",
+    "createdAt": "2025-09-06T13:45:00Z",
+    "updatedAt": "2025-09-06T13:45:00Z"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "u1",
+    "name": "John Doe",
+    "email": "john@test.com",
+    "password": "password123",
+    "createdAt": "2025-08-15T10:00:00Z",
+    "updatedAt": "2025-08-15T10:00:00Z"
+  },
+  {
+    "_id": "u2",
+    "name": "Jane Smith",
+    "email": "jane@test.com",
+    "password": "mypassword",
+    "createdAt": "2025-08-20T14:30:00Z",
+    "updatedAt": "2025-08-20T14:30:00Z"
+  },
+  {
+    "_id": "u3",
+    "name": "Bob Johnson",
+    "email": "bob@test.com",
+    "password": "secure456",
+    "createdAt": "2025-08-25T09:15:00Z",
+    "updatedAt": "2025-08-25T09:15:00Z"
+  }
+]
