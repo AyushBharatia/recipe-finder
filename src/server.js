@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./shared/middlewares/connect-db");
 const { recipesRoute } = require("./modules/recipes/recipes-routes");
 const { authRoute } = require("./modules/auth/auth-routes");
 const { favoritesRoute } = require("./modules/favorites/favorites-routes");
@@ -15,6 +16,9 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
+
+// Database connection middleware (connect to MongoDB before handling routes)
+server.use(connectDB);
 
 // Health check endpoint
 server.get("/api/health", (req, res) => {

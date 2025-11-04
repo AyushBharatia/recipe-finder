@@ -1,74 +1,65 @@
-const fs = require("fs/promises");
-const path = require("path");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const USERS_FILE = path.join(__dirname, "../../data/users.json");
+// User Schema
+// Defines the structure and validation for User documents
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      trim: true,
+      minlength: [2, "Name must be at least 2 characters long"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters long"],
+      select: false, // Don't include password in queries by default
+    },
+  },
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt
+  }
+);
 
-// Helper: Read users from file
-async function readUsersFile() {
+// Pre-save hook to hash password before saving to database
+// Only hashes if password is new or modified
+userSchema.pre("save", async function (next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified("password")) {
+    return next();
+  }
+
   try {
-    const data = await fs.readFile(USERS_FILE, "utf-8");
-    return JSON.parse(data);
+    // Generate salt and hash password
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
   } catch (error) {
-    console.log(error);
+    next(error);
+  }
+});
+
+// Instance method to compare password for login
+// Takes candidatePassword string and returns true if password matches
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
     throw error;
   }
-}
-
-// Helper: Write users to file
-async function writeUsersFile(users) {
-  try {
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-}
-
-// Get all users
-async function getAllUsers() {
-  return await readUsersFile();
-}
-
-// Get user by ID
-async function getUserById(id) {
-  const users = await readUsersFile();
-  return users.find((user) => user._id === id);
-}
-
-// Get user by email
-async function getUserByEmail(email) {
-  const users = await readUsersFile();
-  return users.find((user) => user.email.toLowerCase() === email.toLowerCase());
-}
-
-// Create new user (register)
-async function createUser(data) {
-  const users = await readUsersFile();
-
-  // Check if user already exists
-  const existingUser = await getUserByEmail(data.email);
-  if (existingUser) {
-    return null; // User already exists
-  }
-
-  const newUser = {
-    _id: "u" + Date.now(),
-    name: data.name,
-    email: data.email,
-    password: data.password, // Plain text for Phase 2
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  users.push(newUser);
-  await writeUsersFile(users);
-
-  return newUser;
-}
-
-module.exports = {
-  getAllUsers,
-  getUserById,
-  getUserByEmail,
-  createUser,
 };
+
+// Create and export User model
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

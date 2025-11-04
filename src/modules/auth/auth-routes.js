@@ -1,7 +1,8 @@
 const { Router } = require("express");
 const registerRules = require("./middlewares/register-rules");
 const loginRules = require("./middlewares/login-rules");
-const AuthModel = require("./auth-model");
+const User = require("./auth-model");
+const { generateToken } = require("../../shared/utils/jwt");
 
 const authRoute = Router();
 
@@ -10,20 +11,48 @@ authRoute.post("/register", registerRules, async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const newUser = await AuthModel.createUser({ name, email, password });
-
-    if (!newUser) {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res
         .status(400)
         .json({ message: "User with this email already exists" });
     }
 
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = newUser;
+    // Create new user (password will be hashed by pre-save hook)
+    const user = await User.create({ name, email, password });
 
-    res.status(201).json(userWithoutPassword);
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    // Return user without password and token
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
   } catch (error) {
-    console.log(error);
+    console.error("Register error:", error);
+
+    // Handle duplicate key error (in case unique constraint check fails)
+    if (error.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
+    }
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: errors.join(", ") });
+    }
+
     res.status(500).json({ message: "Failed to register user" });
   }
 });
@@ -33,27 +62,37 @@ authRoute.post("/login", loginRules, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await AuthModel.getUserByEmail(email);
+    // Find user and include password field (it's excluded by default)
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Check password (plain text for Phase 2)
-    if (user.password !== password) {
+    // Compare password using bcrypt
+    const isPasswordCorrect = await user.comparePassword(password);
+
+    if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Return user without password and a dummy token
-    const { password: _, ...userWithoutPassword } = user;
+    // Generate JWT token
+    const token = generateToken(user._id);
 
+    // Return user without password and token
     res.status(200).json({
       message: "Login successful",
-      token: "dummy-jwt-token-" + Date.now(),
-      user: userWithoutPassword,
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     });
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error);
     res.status(500).json({ message: "Failed to login" });
   }
 });
