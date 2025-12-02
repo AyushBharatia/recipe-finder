@@ -122,6 +122,7 @@ The server will run on `http://localhost:3000`
     - `ingredients` - Filter by ingredients (comma-separated, must have all)
     - `search` - Text search in title and ingredients
     - `sortBy` - Sort field (cookTime, title, createdAt, -createdAt for desc)
+- `GET /api/recipes/cuisines` - Get all unique cuisines from database
 - `GET /api/recipes/:id` - Get recipe by ID
 - `POST /api/recipes` - Create new recipe
 - `PUT /api/recipes/:id` - Update recipe
@@ -234,3 +235,85 @@ The server will run on `http://localhost:3000`
 - **express-validator** - Input validation
 - **CORS** - Cross-Origin Resource Sharing
 - **dotenv** - Environment variables
+
+---
+
+## Frontend Integration (Phase 4)
+
+### What Was Implemented
+
+#### 1. Backend: Cuisines API Endpoint
+- **File:** `src/modules/recipes/recipes-routes.js`
+- Added `GET /api/recipes/cuisines` endpoint
+- Returns all unique cuisines from the database, sorted alphabetically
+
+#### 2. Frontend: Dynamic Cuisine Fetching
+- **File:** `frontend/src/services/recipeService.js`
+- Added `getCuisines()` function to fetch cuisines from API
+
+#### 3. Frontend: SearchFilter Component
+- **File:** `frontend/src/components/recipes/SearchFilter.js`
+- Removed hardcoded CUISINES array
+- Now fetches cuisines dynamically from the API on component mount
+
+#### 4. Frontend: RecipeForm Component
+- **File:** `frontend/src/components/recipes/RecipeForm.js`
+- Removed hardcoded CUISINES array
+- Fetches cuisines dynamically from API
+- Added "Other" option with custom text input for new cuisine types
+- Users can add recipes with cuisines not yet in the database (e.g., "Dessert")
+
+#### 5. Database Seeded
+- Ran `npm run seed` to populate MongoDB with 6 preset recipes:
+  - Chana Masala (Indian)
+  - Pesto Pasta (Italian)
+  - Tacos al Pastor (Mexican)
+  - Kung Pao Chicken (Chinese)
+  - Classic Burger (American)
+  - Pad Thai (Thai)
+
+### Frontend Project Structure
+
+```
+frontend/
+├── src/
+│   ├── pages/                    # Page components
+│   │   ├── Home.js
+│   │   ├── Login.js
+│   │   ├── Register.js
+│   │   ├── Recipes.js
+│   │   ├── RecipeDetail.js
+│   │   ├── CreateRecipe.js
+│   │   ├── EditRecipe.js
+│   │   └── Favorites.js
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Navbar.js
+│   │   │   ├── ProtectedRoute.js
+│   │   │   └── Message.js
+│   │   └── recipes/
+│   │       ├── RecipeCard.js
+│   │       ├── RecipeForm.js
+│   │       └── SearchFilter.js
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── recipeService.js
+│   │   ├── authService.js
+│   │   └── favoriteService.js
+│   ├── context/
+│   │   └── AuthContext.js
+│   └── App.js
+```
+
+### How to Run Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Frontend runs on `http://localhost:3001` (or next available port)
+
+---
+
