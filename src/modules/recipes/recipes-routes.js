@@ -5,6 +5,17 @@ const Recipe = require("./recipes-model");
 
 const recipesRoute = Router();
 
+// GET all unique cuisines from recipes
+recipesRoute.get("/cuisines", async (req, res) => {
+  try {
+    const cuisines = await Recipe.distinct("cuisine");
+    res.status(200).json(cuisines.sort());
+  } catch (error) {
+    console.error("Get cuisines error:", error);
+    res.status(500).json({ message: "Failed to retrieve cuisines" });
+  }
+});
+
 // GET all recipes with optional filters, search, sort, and pagination
 recipesRoute.get("/", async (req, res) => {
   try {
