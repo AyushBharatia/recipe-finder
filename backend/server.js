@@ -20,6 +20,10 @@ const hostname = "0.0.0.0";
 
 const server = express();
 
+// Trust proxy (required for Render, Heroku, etc. behind reverse proxy)
+// Enables correct IP detection for rate limiting
+server.set("trust proxy", 1);
+
 // Security middleware
 server.use(helmet()); // Set security HTTP headers
 server.use(mongoSanitize()); // Sanitize data against NoSQL injection
