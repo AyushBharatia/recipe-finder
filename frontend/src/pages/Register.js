@@ -73,14 +73,33 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await register(formData.name, formData.email, formData.password);
-      setMessage({
-        type: 'success',
-        text: 'Registration successful! Redirecting...',
-      });
-      setTimeout(() => {
-        navigate('/recipes', { replace: true });
-      }, 1000);
+      const response = await register(formData.name, formData.email, formData.password);
+
+      if (response.otpSent) {
+        // Redirect to OTP verification page
+        setMessage({
+          type: 'success',
+          text: 'Verification code sent! Please check your email.',
+        });
+        setTimeout(() => {
+          navigate('/verify-otp', {
+            state: {
+              email: response.email,
+              isRegistration: true,
+              from: '/recipes',
+            },
+          });
+        }, 1000);
+      } else if (response.token) {
+        // Direct registration (fallback - shouldn't happen with MFA)
+        setMessage({
+          type: 'success',
+          text: 'Registration successful! Redirecting...',
+        });
+        setTimeout(() => {
+          navigate('/recipes', { replace: true });
+        }, 1000);
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

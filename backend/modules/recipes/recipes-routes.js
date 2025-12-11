@@ -2,10 +2,15 @@ const { Router } = require("express");
 const createRecipeRules = require("./middlewares/create-recipe-rules");
 const updateRecipeRules = require("./middlewares/update-recipe-rules");
 const Recipe = require("./recipes-model");
+const { protect, optionalAuth } = require("../../shared/middlewares/auth");
+const { checkRecipeOwnership } = require("../../shared/middlewares/check-ownership");
+const { handleUpload } = require("../../shared/middlewares/upload");
+const { parseFormData } = require("../../shared/middlewares/parse-form-data");
+const { uploadImage, deleteImage } = require("../../shared/services/cloudinary-service");
 
 const recipesRoute = Router();
 
-// GET all unique cuisines from recipes
+// GET all unique cuisines from recipes (Public)
 recipesRoute.get("/cuisines", async (req, res) => {
   try {
     const cuisines = await Recipe.distinct("cuisine");
@@ -17,7 +22,8 @@ recipesRoute.get("/cuisines", async (req, res) => {
 });
 
 // GET all recipes with optional filters, search, sort, and pagination
-recipesRoute.get("/", async (req, res) => {
+// Shows: preset recipes (for everyone) + user's own recipes (if logged in)
+recipesRoute.get("/", optionalAuth, async (req, res) => {
   try {
     const {
       page = 1,
@@ -31,6 +37,18 @@ recipesRoute.get("/", async (req, res) => {
 
     // Build query object
     const query = {};
+
+    // Filter by visibility: preset recipes OR user's own recipes
+    if (req.user) {
+      // Logged in: show preset recipes + user's own recipes
+      query.$or = [
+        { isPreset: true },
+        { createdBy: req.user._id }
+      ];
+    } else {
+      // Not logged in: show only preset recipes
+      query.isPreset = true;
+    }
 
     // Text search (searches in title and ingredients)
     if (search) {
@@ -80,7 +98,7 @@ recipesRoute.get("/", async (req, res) => {
   }
 });
 
-// GET recipe by ID
+// GET recipe by ID (Public)
 recipesRoute.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -104,10 +122,22 @@ recipesRoute.get("/:id", async (req, res) => {
   }
 });
 
-// POST create new recipe
-recipesRoute.post("/", createRecipeRules, async (req, res) => {
+// POST create new recipe (Protected - any authenticated user)
+recipesRoute.post("/", protect, handleUpload, parseFormData, createRecipeRules, async (req, res) => {
   try {
-    const newRecipe = await Recipe.create(req.body);
+    let recipeData = { ...req.body };
+
+    // Handle image upload to Cloudinary
+    if (req.file) {
+      const { url, publicId } = await uploadImage(req.file.buffer);
+      recipeData.imageUrl = url;
+      recipeData.cloudinaryId = publicId;
+    }
+
+    // Add createdBy from authenticated user
+    recipeData.createdBy = req.user._id;
+
+    const newRecipe = await Recipe.create(recipeData);
     res.status(201).json(newRecipe);
   } catch (error) {
     console.error("Create recipe error:", error);
@@ -122,20 +152,30 @@ recipesRoute.post("/", createRecipeRules, async (req, res) => {
   }
 });
 
-// PUT update recipe by ID
-recipesRoute.put("/:id", updateRecipeRules, async (req, res) => {
+// PUT update recipe by ID (Protected - owner or admin only)
+recipesRoute.put("/:id", protect, checkRecipeOwnership, handleUpload, parseFormData, updateRecipeRules, async (req, res) => {
   try {
-    const { id } = req.params;
+    let updateData = { ...req.body };
 
+    // Handle image upload to Cloudinary
+    if (req.file) {
+      // Delete old image from Cloudinary if exists
+      if (req.recipe.cloudinaryId) {
+        await deleteImage(req.recipe.cloudinaryId);
+      }
+
+      // Upload new image
+      const { url, publicId } = await uploadImage(req.file.buffer);
+      updateData.imageUrl = url;
+      updateData.cloudinaryId = publicId;
+    }
+
+    // req.recipe is already fetched and validated by checkRecipeOwnership
     const updatedRecipe = await Recipe.findByIdAndUpdate(
-      id,
-      req.body,
+      req.params.id,
+      updateData,
       { new: true, runValidators: true } // Return updated doc and run validators
     );
-
-    if (!updatedRecipe) {
-      return res.status(404).json({ message: "Recipe not found" });
-    }
 
     res.status(200).json(updatedRecipe);
   } catch (error) {
@@ -156,20 +196,20 @@ recipesRoute.put("/:id", updateRecipeRules, async (req, res) => {
   }
 });
 
-// DELETE recipe by ID
-recipesRoute.delete("/:id", async (req, res) => {
+// DELETE recipe by ID (Protected - owner or admin only)
+recipesRoute.delete("/:id", protect, checkRecipeOwnership, async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const deletedRecipe = await Recipe.findByIdAndDelete(id);
-
-    if (!deletedRecipe) {
-      return res.status(404).json({ message: "Recipe not found" });
+    // Delete image from Cloudinary if exists
+    if (req.recipe.cloudinaryId) {
+      await deleteImage(req.recipe.cloudinaryId);
     }
+
+    // req.recipe is already fetched and validated by checkRecipeOwnership
+    await Recipe.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       message: "Recipe deleted successfully",
-      recipe: deletedRecipe,
+      recipe: req.recipe,
     });
   } catch (error) {
     console.error("Delete recipe error:", error);

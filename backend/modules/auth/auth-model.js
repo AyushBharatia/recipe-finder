@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       minlength: [6, "Password must be at least 6 characters long"],
       select: false, // Don't include password in queries by default
     },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
@@ -34,6 +39,11 @@ const userSchema = new mongoose.Schema(
 // Pre-save hook to hash password before saving to database
 // Only hashes if password is new or modified
 userSchema.pre("save", async function (next) {
+  // Skip if flag is set (password already hashed)
+  if (this.$skipPasswordHash) {
+    return next();
+  }
+
   // Only hash the password if it has been modified (or is new)
   if (!this.isModified("password")) {
     return next();

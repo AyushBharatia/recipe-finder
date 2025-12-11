@@ -69,7 +69,19 @@ const recipeSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
       trim: true,
-      match: [/^https?:\/\/.+/, "Please provide a valid URL"],
+    },
+    cloudinaryId: {
+      type: String,
+      trim: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false, // Optional for backward compatibility with existing recipes
+    },
+    isPreset: {
+      type: Boolean,
+      default: false, // Preset recipes are visible to everyone
     },
   },
   {
@@ -83,6 +95,7 @@ recipeSchema.index({ title: "text", ingredients: "text" });
 // Create indexes for filtering
 recipeSchema.index({ cuisine: 1 });
 recipeSchema.index({ cookTime: 1 });
+recipeSchema.index({ createdBy: 1 });
 
 // Create and export Recipe model
 const Recipe = mongoose.model("Recipe", recipeSchema);

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import recipeService from '../services/recipeService';
 import favoriteService from '../services/favoriteService';
@@ -112,11 +111,6 @@ const Recipes = () => {
     <div className="recipes-page">
       <div className="recipes-header">
         <h1>Recipes</h1>
-        {isAuthenticated && (
-          <Link to="/recipes/new" className="add-recipe-btn">
-            + Add Recipe
-          </Link>
-        )}
       </div>
 
       {message.text && (
@@ -127,7 +121,11 @@ const Recipes = () => {
         />
       )}
 
-      <SearchFilter filters={filters} onFilterChange={handleFilterChange} />
+      <SearchFilter
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        showAddButton={isAuthenticated}
+      />
 
       {loading ? (
         <div className="loading-container">

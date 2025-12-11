@@ -5,6 +5,14 @@ import RecipeForm from '../components/recipes/RecipeForm';
 import Message from '../components/common/Message';
 import '../components/recipes/Recipes.css';
 
+// Inline SVG Icon
+const ArrowLeftIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+
 const CreateRecipe = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -33,11 +41,14 @@ const CreateRecipe = () => {
 
   return (
     <div className="recipe-form-page">
-      <Link to="/recipes" className="back-link">
-        ← Back to Recipes
-      </Link>
-
-      <h1>Create New Recipe</h1>
+      <div className="recipe-form-header">
+        <Link to="/recipes" className="back-link">
+          <ArrowLeftIcon />
+          <span>Back to Recipes</span>
+        </Link>
+        <h1>Create New Recipe</h1>
+        <p className="recipe-form-subtitle">Fill in the details below to add your recipe to the collection.</p>
+      </div>
 
       {message.text && (
         <Message

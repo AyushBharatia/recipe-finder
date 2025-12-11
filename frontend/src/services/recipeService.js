@@ -17,12 +17,22 @@ const recipeService = {
   },
 
   async create(recipeData) {
-    const response = await api.post('/recipes', recipeData);
+    // recipeData is FormData for file uploads
+    const response = await api.post('/recipes', recipeData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 
   async update(id, recipeData) {
-    const response = await api.put(`/recipes/${id}`, recipeData);
+    // recipeData is FormData for file uploads
+    const response = await api.put(`/recipes/${id}`, recipeData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 

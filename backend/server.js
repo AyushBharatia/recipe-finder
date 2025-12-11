@@ -2,15 +2,27 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 const connectDB = require("./shared/middlewares/connect-db");
 const { recipesRoute } = require("./modules/recipes/recipes-routes");
 const { authRoute } = require("./modules/auth/auth-routes");
 const { favoritesRoute } = require("./modules/favorites/favorites-routes");
+const {
+  apiLimiter,
+  authLimiter,
+  otpLimiter,
+  resendOtpLimiter,
+} = require("./shared/middlewares/rate-limit");
 
 const port = process.env.PORT || 3000;
 const hostname = "localhost";
 
 const server = express();
+
+// Security middleware
+server.use(helmet()); // Set security HTTP headers
+server.use(mongoSanitize()); // Sanitize data against NoSQL injection
 
 // built-in middlewares to parse request body in application-level
 server.use(cors());
@@ -19,6 +31,9 @@ server.use(express.urlencoded({ extended: true }));
 
 // Database connection middleware (connect to MongoDB before handling routes)
 server.use(connectDB);
+
+// Apply general rate limiting to all API routes
+server.use("/api", apiLimiter);
 
 // Health check endpoint
 server.get("/api/health", (req, res) => {
@@ -29,9 +44,15 @@ server.get("/api/health", (req, res) => {
   });
 });
 
-// Mount all the routes
+// Mount all the routes with specific rate limiters
 server.use("/api/recipes", recipesRoute);
+
+// Auth routes with specific rate limiters
+server.use("/api/auth/login", authLimiter);
+server.use("/api/auth/verify-otp", otpLimiter);
+server.use("/api/auth/resend-otp", resendOtpLimiter);
 server.use("/api/auth", authRoute);
+
 server.use("/api/users", favoritesRoute);
 
 // error-handling middleware to logs the error for debugging.

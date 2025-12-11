@@ -58,11 +58,27 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(formData.email, formData.password);
-      setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
-      setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 1000);
+      const response = await login(formData.email, formData.password);
+
+      if (response.otpSent) {
+        // Redirect to OTP verification page
+        setMessage({ type: 'success', text: 'Verification code sent to your email!' });
+        setTimeout(() => {
+          navigate('/verify-otp', {
+            state: {
+              userId: response.userId,
+              email: response.email,
+              from: from,
+            },
+          });
+        }, 1000);
+      } else {
+        // Direct login (fallback - shouldn't happen with MFA)
+        setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1000);
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || 'Login failed. Please try again.';

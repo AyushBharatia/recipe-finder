@@ -4,7 +4,52 @@ import { useAuth } from '../context/AuthContext';
 import recipeService from '../services/recipeService';
 import favoriteService from '../services/favoriteService';
 import Message from '../components/common/Message';
+import RoleGuard from '../components/common/RoleGuard';
 import '../components/recipes/Recipes.css';
+
+// Inline SVG Icons
+const ClockIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const HeartIcon = ({ filled }) => (
+  <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
+const ArrowLeftIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -129,7 +174,8 @@ const RecipeDetail = () => {
       )}
 
       <Link to="/recipes" className="back-link">
-        ← Back to Recipes
+        <ArrowLeftIcon />
+        <span>Back to Recipes</span>
       </Link>
 
       <div className="recipe-detail">
@@ -150,36 +196,40 @@ const RecipeDetail = () => {
 
             <div className="recipe-meta">
               <div className="meta-item">
-                <span className="meta-icon">⏱</span>
+                <ClockIcon />
                 <span>{recipe.cookTime} minutes</span>
               </div>
               <div className="meta-item">
-                <span className="meta-icon">👥</span>
+                <UsersIcon />
                 <span>{recipe.servings} servings</span>
               </div>
             </div>
 
             <div className="recipe-actions">
               <button
-                className={`favorite-action-btn ${isFavorite ? 'favorited' : ''}`}
+                className={`action-icon-btn favorite-icon-btn ${isFavorite ? 'favorited' : ''}`}
                 onClick={handleFavoriteToggle}
+                title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
               >
-                {isFavorite ? '♥ Remove from Favorites' : '♡ Add to Favorites'}
+                <HeartIcon filled={isFavorite} />
               </button>
 
-              {isAuthenticated && (
-                <>
-                  <Link to={`/recipes/${id}/edit`} className="edit-btn">
-                    Edit Recipe
-                  </Link>
-                  <button
-                    className="delete-btn"
-                    onClick={() => setShowDeleteConfirm(true)}
-                  >
-                    Delete Recipe
-                  </button>
-                </>
-              )}
+              <RoleGuard
+                allowedRoles={['admin', 'user']}
+                requireOwnership={true}
+                ownerId={recipe.createdBy}
+              >
+                <Link to={`/recipes/${id}/edit`} className="action-icon-btn edit-icon-btn" title="Edit Recipe">
+                  <EditIcon />
+                </Link>
+                <button
+                  className="action-icon-btn delete-icon-btn"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  title="Delete Recipe"
+                >
+                  <TrashIcon />
+                </button>
+              </RoleGuard>
             </div>
           </div>
         </div>
