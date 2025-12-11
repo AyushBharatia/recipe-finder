@@ -8,6 +8,7 @@ const connectDB = require("./shared/middlewares/connect-db");
 const { recipesRoute } = require("./modules/recipes/recipes-routes");
 const { authRoute } = require("./modules/auth/auth-routes");
 const { favoritesRoute } = require("./modules/favorites/favorites-routes");
+const { adminRoute } = require("./modules/admin/admin-routes");
 const {
   apiLimiter,
   authLimiter,
@@ -58,6 +59,9 @@ server.use("/api/auth/resend-otp", resendOtpLimiter);
 server.use("/api/auth", authRoute);
 
 server.use("/api/users", favoritesRoute);
+
+// Admin routes (protected - admin only)
+server.use("/api/admin", adminRoute);
 
 // error-handling middleware to logs the error for debugging.
 server.use((error, req, res, next) => {
