@@ -78,35 +78,35 @@ recipe-finder/
 │           ├── otp.js              # OTP generation/verification
 │           └── errorHandler.js     # Custom error classes
 │
-└── frontend/                       # React Frontend Application
+└── frontend/                       # React Frontend Application (Vite)
     ├── package.json                # Frontend dependencies
-    ├── public/
-    │   └── index.html
+    ├── vite.config.js              # Vite configuration
+    ├── index.html                  # Entry HTML (in root for Vite)
     └── src/
-        ├── App.js                  # Main app with React Router
-        ├── index.js                # Entry point
+        ├── App.jsx                 # Main app with React Router
+        ├── index.jsx               # Entry point
         ├── pages/                  # Page components
-        │   ├── Home.js             # Landing page with hero
-        │   ├── Login.js            # Login form
-        │   ├── Register.js         # Registration form
-        │   ├── VerifyOTP.js        # OTP verification page
-        │   ├── Recipes.js          # Recipe listing with filters
-        │   ├── RecipeDetail.js     # Single recipe view
-        │   ├── CreateRecipe.js     # Create recipe form
-        │   ├── EditRecipe.js       # Edit recipe form
-        │   └── Favorites.js        # User's favorite recipes
+        │   ├── Home.jsx            # Landing page with hero
+        │   ├── Login.jsx           # Login form
+        │   ├── Register.jsx        # Registration form
+        │   ├── VerifyOTP.jsx       # OTP verification page
+        │   ├── Recipes.jsx         # Recipe listing with filters
+        │   ├── RecipeDetail.jsx    # Single recipe view
+        │   ├── CreateRecipe.jsx    # Create recipe form
+        │   ├── EditRecipe.jsx      # Edit recipe form
+        │   └── Favorites.jsx       # User's favorite recipes
         ├── components/
         │   ├── common/
-        │   │   ├── Navbar.js       # Navigation with user dropdown
+        │   │   ├── Navbar.jsx      # Navigation with user dropdown
         │   │   ├── Navbar.css
-        │   │   ├── ProtectedRoute.js  # Route guard for auth
-        │   │   ├── RoleGuard.js    # Role-based UI visibility
-        │   │   ├── Message.js      # Toast notifications
+        │   │   ├── ProtectedRoute.jsx # Route guard for auth
+        │   │   ├── RoleGuard.jsx   # Role-based UI visibility
+        │   │   ├── Message.jsx     # Toast notifications
         │   │   └── Message.css
         │   └── recipes/
-        │       ├── RecipeCard.js   # Recipe card component
-        │       ├── RecipeForm.js   # Shared form for create/edit
-        │       ├── SearchFilter.js # Search and filter controls
+        │       ├── RecipeCard.jsx  # Recipe card component
+        │       ├── RecipeForm.jsx  # Shared form for create/edit
+        │       ├── SearchFilter.jsx # Search and filter controls
         │       └── Recipes.css
         ├── services/
         │   ├── api.js              # Axios instance with interceptors
@@ -114,7 +114,7 @@ recipe-finder/
         │   ├── authService.js      # Auth API calls
         │   └── favoriteService.js  # Favorites API calls
         ├── context/
-        │   └── AuthContext.js      # Auth state management
+        │   └── AuthContext.jsx     # Auth state management
         └── styles/
             ├── App.css
             ├── Home.css
@@ -287,14 +287,14 @@ npm start
 
 Backend runs on `http://localhost:3000`
 
-### Frontend Application
+### Frontend Application (Vite)
 
 ```bash
 cd frontend
-npm start
+npm run dev
 ```
 
-Frontend runs on `http://localhost:3001` (or next available port)
+Frontend runs on `http://localhost:3001` (opens automatically)
 
 ---
 
@@ -473,9 +473,9 @@ npm start        # Start backend in production mode
 npm run seed     # Seed database with sample data
 
 # Frontend scripts (from frontend directory)
-npm start        # Start React development server
+npm run dev      # Start Vite development server
 npm run build    # Build for production
-npm test         # Run tests
+npm run preview  # Preview production build
 ```
 
 --
